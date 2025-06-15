@@ -1,46 +1,87 @@
 
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
+import { useChats, Chat } from "@/hooks/useChats";
+import ChatSearch from "./ChatSearch";
+import ChatItem from "./ChatItem";
+import { LogOut, Plus } from "lucide-react";
 
-// Dummy data for chat history to showcase the layout.
-// This will be replaced with real data after backend integration.
-const chatHistory = [
-  { id: "1", title: "Exploring React Hooks" },
-  { id: "2", title: "Building a TailwindCSS UI" },
-  { id: "3", title: "Python FastAPI basics" },
-  { id: "4", title: "All about LLMs" },
-];
+interface SidebarProps {
+  activeChatId: string | null;
+  onChatSelect: (chatId: string) => void;
+}
 
 /**
  * Sidebar component containing chat history and user actions.
  * It's designed to be responsive and hides on smaller screens.
- * @returns {JSX.Element} The rendered sidebar.
  */
-const Sidebar = () => {
+const Sidebar: React.FC<SidebarProps> = ({ activeChatId, onChatSelect }) => {
+  const { user, signOut } = useAuth();
+  const { chats, loading, createChat, updateChatTitle, deleteChat } = useChats();
+  const [filteredChats, setFilteredChats] = useState<Chat[]>([]);
+
+  useEffect(() => {
+    setFilteredChats(chats);
+  }, [chats]);
+
+  const handleNewChat = async () => {
+    const chatId = await createChat();
+    if (chatId) {
+      onChatSelect(chatId);
+    }
+  };
+
+  const handleDeleteChat = async (chatId: string) => {
+    await deleteChat(chatId);
+    if (activeChatId === chatId) {
+      onChatSelect(chats.length > 1 ? chats[0].id : '');
+    }
+  };
+
   return (
     <aside className="w-64 flex-shrink-0 bg-secondary/30 p-4 flex-col border-r border-border hidden md:flex">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-xl font-bold">Chats</h1>
-        <Button variant="ghost" size="sm">
+        <Button variant="ghost" size="sm" onClick={handleNewChat}>
+          <Plus className="h-4 w-4 mr-1" />
           New Chat
         </Button>
       </div>
+      
+      <ChatSearch chats={chats} onFilteredChats={setFilteredChats} />
+      
       <div className="flex-1 overflow-y-auto -mr-4 pr-4">
-        <nav className="flex flex-col gap-2">
-          {chatHistory.map((chat) => (
-            <a
-              key={chat.id}
-              href="#"
-              className="p-2 rounded-lg text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors text-sm truncate"
-            >
-              {chat.title}
-            </a>
-          ))}
-        </nav>
+        {loading ? (
+          <div className="text-center text-muted-foreground">Loading...</div>
+        ) : (
+          <nav className="flex flex-col gap-1">
+            {filteredChats.map((chat) => (
+              <ChatItem
+                key={chat.id}
+                chat={chat}
+                isActive={activeChatId === chat.id}
+                onClick={() => onChatSelect(chat.id)}
+                onRename={updateChatTitle}
+                onDelete={handleDeleteChat}
+              />
+            ))}
+            {filteredChats.length === 0 && !loading && (
+              <div className="text-center text-muted-foreground text-sm mt-4">
+                No chats found
+              </div>
+            )}
+          </nav>
+        )}
       </div>
-      <div className="mt-auto">
-        {/* Auth features will be added after Supabase integration. */}
-        <Button variant="outline" className="w-full justify-center">
-          Login / Sign Up
+      
+      <div className="mt-auto space-y-2">
+        <div className="text-sm text-muted-foreground truncate">
+          {user?.email}
+        </div>
+        <Button variant="outline" className="w-full justify-center" onClick={signOut}>
+          <LogOut className="h-4 w-4 mr-2" />
+          Sign Out
         </Button>
       </div>
     </aside>
