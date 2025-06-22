@@ -3,13 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
-
-export interface Chat {
-  id: string;
-  title: string;
-  created_at: string;
-  updated_at: string;
-}
+import { Chat } from '@/types/chat';
 
 export const useChats = () => {
   const [chats, setChats] = useState<Chat[]>([]);

@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
-import { Chat } from '@/hooks/useChats';
+import { Chat } from '@/types/chat';
 
 interface ChatSearchProps {
   chats: Chat[];

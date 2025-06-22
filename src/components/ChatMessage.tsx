@@ -1,6 +1,6 @@
 
 import { Copy, ThumbsUp, ThumbsDown, Redo } from 'lucide-react';
-import { type Message } from './ChatView';
+import { Message } from '@/types/chat';
 import { Button } from '@/components/ui/button';
 
 interface ChatMessageProps {
@@ -18,7 +18,7 @@ const ChatMessage = ({ message }: ChatMessageProps) => {
 
   // Copies the bot's message text to the clipboard.
   const handleCopy = () => {
-    navigator.clipboard.writeText(message.text);
+    navigator.clipboard.writeText(message.content);
     // In a future version, we could show a toast notification here.
   };
 
@@ -35,7 +35,7 @@ const ChatMessage = ({ message }: ChatMessageProps) => {
             isBot ? 'bg-secondary' : 'bg-primary text-primary-foreground'
           }`}
         >
-          <p className="whitespace-pre-wrap">{message.text}</p>
+          <p className="whitespace-pre-wrap">{message.content}</p>
         </div>
         {isBot && (
           <div className="flex items-center gap-2">
