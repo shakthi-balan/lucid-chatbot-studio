@@ -2,7 +2,8 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { useChats, Chat } from "@/hooks/useChats";
+import { useChats } from "@/hooks/useChats";
+import { Chat } from "@/types/chat";
 import ChatSearch from "./ChatSearch";
 import ChatItem from "./ChatItem";
 import { LogOut, Plus } from "lucide-react";

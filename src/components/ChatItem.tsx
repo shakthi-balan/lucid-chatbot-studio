@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { MoreHorizontal, Edit2, Trash2 } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Chat } from '@/hooks/useChats';
+import { Chat } from '@/types/chat';
 
 interface ChatItemProps {
   chat: Chat;
