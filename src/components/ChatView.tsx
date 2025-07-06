@@ -11,6 +11,7 @@ import { Plus } from 'lucide-react';
 interface ChatViewProps {
   chatId: string | null;
   onNewChat: () => void;
+  onChatCreated: (chatId: string) => void;
 }
 
 // Bot responses for different scenarios
@@ -45,7 +46,7 @@ const getBotResponse = (userMessage: string): string => {
  * Main chat view component.
  * Manages chat state, renders messages, and handles sending new messages.
  */
-const ChatView: React.FC<ChatViewProps> = ({ chatId, onNewChat }) => {
+const ChatView: React.FC<ChatViewProps> = ({ chatId, onNewChat, onChatCreated }) => {
   const { messages, loading, addMessage } = useMessages(chatId);
   const { createChat } = useChats();
   const [isThinking, setIsThinking] = useState(false);
@@ -66,7 +67,10 @@ const ChatView: React.FC<ChatViewProps> = ({ chatId, onNewChat }) => {
     if (!currentChatId) {
       currentChatId = await createChat(text.slice(0, 50) + (text.length > 50 ? '...' : ''));
       if (!currentChatId) return;
-      // The parent will handle the chat selection
+      // Notify parent component about the new chat
+      onChatCreated(currentChatId);
+      // Wait a moment for the state to update
+      await new Promise(resolve => setTimeout(resolve, 100));
     }
 
     // Add user message
@@ -131,6 +135,11 @@ const ChatView: React.FC<ChatViewProps> = ({ chatId, onNewChat }) => {
             {messages.map((msg) => (
               <ChatMessage key={msg.id} message={msg} />
             ))}
+            {messages.length === 0 && !loading && (
+              <div className="text-center text-muted-foreground">
+                No messages yet. Start the conversation!
+              </div>
+            )}
             {isThinking && (
               <div className="flex items-center gap-3 animate-fade-in">
                 <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm shrink-0">B</div>

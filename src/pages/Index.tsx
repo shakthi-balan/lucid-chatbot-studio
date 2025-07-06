@@ -25,6 +25,10 @@ const Index = () => {
     return <AuthPage />;
   }
 
+  const handleChatCreated = (chatId: string) => {
+    setActiveChatId(chatId);
+  };
+
   return (
     <div className="flex h-screen w-full bg-background text-foreground">
       <Sidebar 
@@ -34,7 +38,8 @@ const Index = () => {
       <main className="flex-1 flex flex-col">
         <ChatView 
           chatId={activeChatId} 
-          onNewChat={() => setActiveChatId(null)} 
+          onNewChat={() => setActiveChatId(null)}
+          onChatCreated={handleChatCreated}
         />
       </main>
     </div>

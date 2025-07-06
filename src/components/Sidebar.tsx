@@ -19,12 +19,19 @@ interface SidebarProps {
  */
 const Sidebar: React.FC<SidebarProps> = ({ activeChatId, onChatSelect }) => {
   const { user, signOut } = useAuth();
-  const { chats, loading, createChat, updateChatTitle, deleteChat } = useChats();
+  const { chats, loading, createChat, updateChatTitle, deleteChat, refetch } = useChats();
   const [filteredChats, setFilteredChats] = useState<Chat[]>([]);
 
   useEffect(() => {
     setFilteredChats(chats);
   }, [chats]);
+
+  // Refresh chats when a new chat might have been created
+  useEffect(() => {
+    if (activeChatId && !chats.find(chat => chat.id === activeChatId)) {
+      refetch();
+    }
+  }, [activeChatId, chats, refetch]);
 
   const handleNewChat = async () => {
     const chatId = await createChat();
@@ -36,7 +43,8 @@ const Sidebar: React.FC<SidebarProps> = ({ activeChatId, onChatSelect }) => {
   const handleDeleteChat = async (chatId: string) => {
     await deleteChat(chatId);
     if (activeChatId === chatId) {
-      onChatSelect(chats.length > 1 ? chats[0].id : '');
+      const remainingChats = chats.filter(chat => chat.id !== chatId);
+      onChatSelect(remainingChats.length > 0 ? remainingChats[0].id : '');
     }
   };
 

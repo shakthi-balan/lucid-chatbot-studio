@@ -11,6 +11,7 @@ export const useMessages = (chatId: string | null) => {
   const fetchMessages = async () => {
     if (!chatId) return;
     
+    console.log('Fetching messages for chat:', chatId);
     setLoading(true);
     try {
       const { data, error } = await supabase
@@ -20,6 +21,8 @@ export const useMessages = (chatId: string | null) => {
         .order('created_at', { ascending: true });
 
       if (error) throw error;
+      
+      console.log('Fetched messages:', data);
       
       // Transform the data to match our Message interface
       const transformedMessages: Message[] = (data || []).map(msg => ({
@@ -39,8 +42,13 @@ export const useMessages = (chatId: string | null) => {
   };
 
   const addMessage = async (content: string, sender: 'user' | 'bot'): Promise<boolean> => {
-    if (!chatId) return false;
+    if (!chatId) {
+      console.error('Cannot add message: no chatId');
+      return false;
+    }
 
+    console.log('Adding message:', { chatId, content, sender });
+    
     try {
       const { error } = await supabase
         .from('messages')
@@ -48,6 +56,7 @@ export const useMessages = (chatId: string | null) => {
 
       if (error) throw error;
       
+      console.log('Message added successfully');
       await fetchMessages();
       return true;
     } catch (error) {
@@ -59,8 +68,10 @@ export const useMessages = (chatId: string | null) => {
 
   useEffect(() => {
     if (chatId) {
+      console.log('Chat ID changed to:', chatId);
       fetchMessages();
     } else {
+      console.log('No chat ID, clearing messages');
       setMessages([]);
     }
   }, [chatId]);
